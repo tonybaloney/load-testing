@@ -9,6 +9,7 @@ on:
   pull_request_target:
     branches:
       - 'releases/*'
+      - "main"
 
 # CONFIGURATION
 # For help, go to https://github.com/Azure/Actions
@@ -32,17 +33,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    
-    - uses: actions/checkout@v2
-      name: Checkout from PR branch
-      with: 
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-        path: 'load-testing'
-        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Installing dependencies and building latest changes
       run: |
-        cd load-testing
         npm install
         npm run compile
     
