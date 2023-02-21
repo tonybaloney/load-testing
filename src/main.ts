@@ -289,7 +289,9 @@ async function getLoadTestResource()
     let response = await httpClient.get(armEndpoint, header);
     if(response.message.statusCode != 200) {
         var resource_name: string = core.getInput('loadTestResource');
-        var message = "The Azure Load Testing resource "+ resource_name +" does not exist. Please provide an existing resource.";
+        var message = "Could not fetch the Azure Load Testing resource "+ resource_name +". Please check that it exists.";
+        var errorBody = await response.readBody();
+        core.debug(`Error fetching resource - ${response.message.statusCode}, ${errorBody}.`)
         throw new Error(message);
     }
     let respObj:any = await util.getResultObj(response);
