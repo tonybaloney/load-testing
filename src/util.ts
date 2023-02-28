@@ -103,7 +103,7 @@ export function printClientMetricsMarkdown(obj:any) : string {
     if(Object.keys(obj).length == 0)
         return "";
 
-    var result = "## Client-side metrics \n\n| Transaction | Avg Response Time | Min Response Time | Max Response Time | Requests per sec | Total Requests | Total Errors | Total Error Rate |\n";
+    var result = "## Azure Load Testing Client-side metrics \n\n| Transaction | Avg Response Time | Min Response Time | Max Response Time | Requests per sec | Total Requests | Total Errors | Total Error Rate |\n|-------------|-------------------|-------------------|-------------------|------------------|----------------|--------------|------------------|\n";
     for(var key in obj) {
         if(key != "Total")
             result += printMetricsRow(obj[key]);
