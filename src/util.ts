@@ -90,7 +90,7 @@ export async function getResultsFile(response:any)
         throw new Error(err);
     }
 }
-export async function printClientMetrics(obj:any) {
+export function printClientMetrics(obj:any) {
     if(Object.keys(obj).length == 0)
         return;
     console.log("------------------Client-side metrics------------\n");
@@ -98,6 +98,17 @@ export async function printClientMetrics(obj:any) {
             if(key != "Total")
                 printMetrics(obj[key]);
         }
+}
+export function printClientMetricsMarkdown(obj:any) : string {
+    if(Object.keys(obj).length == 0)
+        return "";
+
+    var result = "## Client-side metrics \n\n| Transaction | Avg Response Time | Min Response Time | Max Response Time | Requests per sec | Total Requests | Total Errors | Total Error Rate |\n";
+    for(var key in obj) {
+        if(key != "Total")
+            result += printMetricsRow(obj[key]);
+    }
+    return result + "\n";
 }
 export async function getStatisticsFile(obj:any) {
     let target = path.join('dropResults',"reports");
@@ -130,6 +141,18 @@ function printMetrics(data:any) {
     console.log("total requests \t\t : "+data.sampleCount)
     console.log("total errors \t\t : " + data.errorCount)
     console.log("total error rate \t : "+data.errorPct + "\n");
+}
+
+function printMetricsRow(data:any): string {
+    return "| " + 
+        data.transaction + " | " + 
+        getAbsVal(data.meanResTime) + "ms | " + 
+        getAbsVal(data.minResTime) + "ms | " + 
+        getAbsVal(data.maxResTime) + "ms | " + 
+        getAbsVal(data.throughput) + " | " + 
+        data.sampleCount + " | " + 
+        data.errorCount + " | " + 
+        data.errorPct + "% |\n";
 }
 
 function getAbsVal(data:any) {

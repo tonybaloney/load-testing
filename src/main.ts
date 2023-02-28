@@ -8,6 +8,8 @@ import { isNullOrUndefined } from 'util';
 import * as github from '@actions/github';
 
 const GITHUB_TOKEN = core.getInput('githubToken');
+const octokit = GITHUB_TOKEN ? github.getOctokit(GITHUB_TOKEN) : undefined;
+const { pull_request } = github.context.payload;
 
 const resultFolder = 'loadTest';
 let baseURL = '';
@@ -244,17 +246,13 @@ async function getTestRunAPI(testRunId:string, testStatus:string, startTime:Date
             if(!isNullOrUndefined(testRunObj.passFailCriteria) && !isNullOrUndefined(testRunObj.passFailCriteria.passFailMetrics))
                 util.printCriteria(testRunObj.passFailCriteria.passFailMetrics)
             if(testRunObj.testRunStatistics != null) {
-                if (GITHUB_TOKEN){
-                    const octokit = github.getOctokit(GITHUB_TOKEN);
-                    const { pull_request } = github.context.payload;
-                    if (pull_request){
-                        await octokit.rest.issues.createComment({
-                            repo: github.context.repo.repo,
-                            owner: github.context.repo.owner,
-                            issue_number: pull_request?.number,
-                            body: 'Load test completed...'
-                        });
-                    }
+                if (octokit && pull_request){
+                    await octokit.rest.issues.createComment({
+                        repo: github.context.repo.repo,
+                        owner: github.context.repo.owner,
+                        issue_number: pull_request?.number,
+                        body: util.printClientMetricsMarkdown(testRunObj.testRunStatistics),
+                    });
                 }
                 util.printClientMetrics(testRunObj.testRunStatistics);
             }
