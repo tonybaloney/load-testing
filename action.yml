@@ -16,6 +16,10 @@ inputs:
   env:
     description: 'Enter env in JSON'
     required: false
+  githubToken:
+    description: 'GitHub token to post comments on the pull request'
+    default: '${{ github.token }}'
+
 branding:
     icon: 'extension-icon.svg'
     color: 'blue'
