@@ -3,7 +3,6 @@ import * as core from '@actions/core'
 const yaml = require('js-yaml');
 const jwt_decode = require('jwt-decode');
 import * as fs from 'fs';
-var FormData = require('form-data');
 import { execFile } from "child_process";
 import * as util from './util';
 import * as index from './main';
@@ -11,7 +10,6 @@ import { isNullOrUndefined } from 'util';
 const pathLib = require('path');
 const { Readable } = require('stream');
 
-import { type } from 'os';
 var testId='';
 var displayName = '';
 var testdesc = 'SampleTest';
