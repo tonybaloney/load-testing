@@ -20,8 +20,12 @@
   "author": "Sweta Kumari",
   "homepage": "https://github.com/kusweta/AzloadTest/blob/main/README.md",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "@actions/core": "^1.5.0",
+    "@actions/github": "^5.1.1",
     "@types/q": "^1.5.5",
     "adal-node": "^0.2.2",
     "adm-zip": "^0.5.6",

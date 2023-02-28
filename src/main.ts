@@ -5,6 +5,12 @@ import * as util from './util';
 import * as fs from 'fs';
 import { isNullOrUndefined } from 'util';
 
+import * as github from '@actions/github';
+
+const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+const octokit = github.getOctokit(GITHUB_TOKEN);
+const { pull_request } = github.context.payload;
+
 const resultFolder = 'loadTest';
 let baseURL = '';
 const httpClient: httpc.HttpClient = new httpc.HttpClient('MALT-GHACTION');
@@ -239,8 +245,17 @@ async function getTestRunAPI(testRunId:string, testStatus:string, startTime:Date
             util.printTestDuration(testRunObj.virtualUsers, startTime);
             if(!isNullOrUndefined(testRunObj.passFailCriteria) && !isNullOrUndefined(testRunObj.passFailCriteria.passFailMetrics))
                 util.printCriteria(testRunObj.passFailCriteria.passFailMetrics)
-            if(testRunObj.testRunStatistics != null)
+            if(testRunObj.testRunStatistics != null) {
+                if (pull_request){
+                    await octokit.rest.issues.createComment({
+                        repo: github.context.repo.repo,
+                        owner: github.context.repo.owner,
+                        issue_number: pull_request?.number,
+                        body: 'Load test completed...'
+                    });
+                }
                 util.printClientMetrics(testRunObj.testRunStatistics);
+            }
             var testResultUrl = util.getResultFolder(testRunObj.testArtifacts);
             if(testResultUrl != null) {
                 const response = await httpClient.get(testResultUrl);
