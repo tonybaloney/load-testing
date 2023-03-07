@@ -9,7 +9,7 @@ import * as github from '@actions/github';
 
 const GITHUB_TOKEN = core.getInput('githubToken');
 const octokit = GITHUB_TOKEN ? github.getOctokit(GITHUB_TOKEN) : undefined;
-const { pull_request } = github.context.payload;
+const { context_payload } = github.context.payload;
 
 const resultFolder = 'loadTest';
 let baseURL = '';
@@ -246,13 +246,27 @@ async function getTestRunAPI(testRunId:string, testStatus:string, startTime:Date
             if(!isNullOrUndefined(testRunObj.passFailCriteria) && !isNullOrUndefined(testRunObj.passFailCriteria.passFailMetrics))
                 util.printCriteria(testRunObj.passFailCriteria.passFailMetrics)
             if(testRunObj.testRunStatistics != null) {
-                if (octokit && pull_request){
+                if (octokit && context_payload?.number){
+                    core.debug("Posting comment to PR.");
                     await octokit.rest.issues.createComment({
                         repo: github.context.repo.repo,
                         owner: github.context.repo.owner,
-                        issue_number: pull_request?.number,
+                        issue_number: context_payload.number,
                         body: util.printClientMetricsMarkdown(testRunObj.testRunStatistics),
                     });
+                } else if (octokit) {
+                    core.debug("Posting comment to commit.");
+                    await octokit.request('POST /repos/{owner}/{repo}/commits/{commit_sha}/comments', {
+                        repo: github.context.repo.repo,
+                        owner: github.context.repo.owner,
+                        commit_sha: github.context.sha,
+                        body: util.printClientMetricsMarkdown(testRunObj.testRunStatistics),
+                        headers: {
+                          'X-GitHub-Api-Version': '2022-11-28'
+                        }
+                    });
+                } else {
+                    core.debug("Insufficient context to post comment to PR/commit.");
                 }
                 util.printClientMetrics(testRunObj.testRunStatistics);
             }
