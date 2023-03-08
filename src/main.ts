@@ -254,17 +254,6 @@ async function getTestRunAPI(testRunId:string, testStatus:string, startTime:Date
                         issue_number: context_payload.number,
                         body: util.printClientMetricsMarkdown(testRunObj.testRunStatistics),
                     });
-                } else if (octokit) {
-                    core.debug("Posting comment to commit.");
-                    await octokit.request('POST /repos/{owner}/{repo}/commits/{commit_sha}/comments', {
-                        repo: github.context.repo.repo,
-                        owner: github.context.repo.owner,
-                        commit_sha: github.context.sha,
-                        body: util.printClientMetricsMarkdown(testRunObj.testRunStatistics),
-                        headers: {
-                          'X-GitHub-Api-Version': '2022-11-28'
-                        }
-                    });
                 } else {
                     core.debug("Insufficient context to post comment to PR/commit.");
                 }
